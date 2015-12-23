@@ -25,8 +25,12 @@ unexpected (void)
 typedef void (*handler)(void);
 extern uint8_t __ram_end__;
 
-// Code Red protextion: NO_ISP
+#if defined (ENABLE_ISP)
+uint32_t crp __attribute__ ((section(".crp"))) = 0;
+#else
+// Code Red protection: NO_ISP
 uint32_t crp __attribute__ ((section(".crp"))) = 0x4E697370;
+#endif
 
 handler vector[48] __attribute__ ((section(".vectors"))) = {
   (handler)&__ram_end__,
@@ -363,7 +367,7 @@ xbus (int num_channels)
   uint16_t *q = &xpwm_values[0];
 
   send_uart (0xa4);
-  send_uart (2+4*16);
+  send_uart (2+4*num_channels);
   crc = crc8_array[(crc ^ 0) & 0xff];
   crc = crc8_array[(crc ^ 0) & 0xff];
   send_uart (0);
