@@ -366,6 +366,8 @@ xbus (int num_channels)
   uint8_t crc = 0;
   uint16_t *q = &xpwm_values[0];
 
+  crc = crc8_array[(crc ^ 0xa4) & 0xff];
+  crc = crc8_array[(crc ^ (2+4*num_channels)) & 0xff];
   send_uart (0xa4);
   send_uart (2+4*num_channels);
   crc = crc8_array[(crc ^ 0) & 0xff];
@@ -452,7 +454,7 @@ sbus_decode (const uint8_t frame[SBUS_FRAME_SIZE])
 	    }
 	}
 
-      /* Mapp SBUS range to XBUS range.
+      /* Map SBUS range to XBUS range.
 	 200 -> 1000micro -> 0x2492
 	 1800 -> 2000micro -> 0xdb6d
       */
