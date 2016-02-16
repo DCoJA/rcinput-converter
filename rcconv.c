@@ -193,10 +193,8 @@ static uint32_t tlast;
 static void
 dtoverflow (void)
 {
-#if 1
   // This is unexpected and should be treated as fatal error.
   for(;;);
-#endif
 }
 
 static void
@@ -483,6 +481,13 @@ sbus_pulse (uint16_t width_s0, uint16_t width_s1)
      Approximate 1/12 to 683/8192  */
   uint8_t byte_ofs = (sbus_state.bit_ofs * 683) >> 13;
   uint8_t bit_ofs = sbus_state.bit_ofs - (byte_ofs * 12);
+
+  if (byte_ofs >= SBUS_FRAME_SIZE)
+    {
+      // invalid sbus frame
+      byte_ofs = SBUS_FRAME_SIZE - 1;
+      goto reset;
+    }
 
   if (bits_s0 == 0 || bits_s1 == 0)
     // invalid data
